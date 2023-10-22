@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 
@@ -26,3 +27,9 @@ def txtread(filename, delimiter=None, dtype=np.float64):
     else:
         ground_truth_rect = np.loadtxt(filename, delimiter=delimiter, dtype=dtype)
         return ground_truth_rect
+
+
+def load_seq_result(dataset_file, seq_name):
+    seq_result_path = os.path.join(dataset_file, seq_name + '.txt')
+    result = txtread(seq_result_path, [',', '\t'])
+    return result
