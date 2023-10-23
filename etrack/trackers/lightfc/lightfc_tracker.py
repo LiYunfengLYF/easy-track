@@ -6,18 +6,17 @@ from .utils import sample_target, Preprocessor, hann2d, clip_box
 
 
 class lightfc(Tracker):
-    def __init__(self):
-        super().__init__()
-        network = LightFC()
+    def __init__(self, checkpoint_path=None, use_cuda=True):
+        super().__init__(checkpoint_path, use_cuda, 'lightfc')
 
-        for module in network.head.modules():
+        self.cfg = cfg()
+        self.network = LightFC().to(self.device).eval()
+        self.load_checkpoint()
+
+        for module in self.network.head.modules():
             if hasattr(module, 'switch_to_deploy'):
                 module.switch_to_deploy()
 
-        self.cfg = cfg()
-        self.network = network.cuda()
-
-        self.network.eval()
         self.preprocessor = Preprocessor()
         self.state = None
 

@@ -1,8 +1,24 @@
 import torch
+import numpy as np
 import torch.nn as nn
 from torchvision.ops import FrozenBatchNorm2d
 
-from .fusion import SE
+
+def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1,
+         freeze_bn=False):
+    if freeze_bn:
+        return nn.Sequential(
+            nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
+                      padding=padding, dilation=dilation, bias=True),
+            FrozenBatchNorm2d(out_planes),
+            nn.ReLU(inplace=True))
+    else:
+        return nn.Sequential(
+            nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
+                      padding=padding, dilation=dilation, bias=True),
+            nn.BatchNorm2d(out_planes),
+            nn.ReLU(inplace=True))
+
 
 def conv_bn(in_channels, out_channels, kernel_size, stride, padding, groups=1):
     result = nn.Sequential()
@@ -11,6 +27,7 @@ def conv_bn(in_channels, out_channels, kernel_size, stride, padding, groups=1):
                                         bias=True))
     result.add_module('bn', nn.BatchNorm2d(num_features=out_channels))
     return result
+
 
 class RepN33(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1, dilation=1, groups=1,
@@ -38,11 +55,31 @@ class RepN33(nn.Module):
             self.rbr_3x3 = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=stride,
                                    padding=padding, groups=groups)
 
+        # for p in self.parameters():
+        #     if p.dim() > 1:
+        #         nn.init.xavier_uniform_(p)
+
     def forward(self, inputs):
         if hasattr(self, 'rbr_reparam'):
             return self.nonlinearity(self.rbr_reparam(inputs))
 
         return self.nonlinearity(self.rbr_dense(inputs) + self.rbr_3x3(inputs))
+
+    def get_custom_L2(self):
+        K3 = self.rbr_dense.conv.weight
+        K1 = self.rbr_3x3.conv.weight
+        t3 = (self.rbr_dense.bn.weight / ((self.rbr_dense.bn.running_var + self.rbr_dense.bn.eps).sqrt())).reshape(-1,
+                                                                                                                   1, 1,
+                                                                                                                   1).detach()
+        t1 = (self.rbr_3x3.bn.weight / ((self.rbr_3x3.bn.running_var + self.rbr_3x3.bn.eps).sqrt())).reshape(-1, 1, 1,
+                                                                                                             1).detach()
+
+        l2_loss_circle = (K3 ** 2).sum() - (K3[:, :, 1:2,
+                                            1:2] ** 2).sum()  # The L2 loss of the "circle" of weights in 3x3 kernel. Use regular L2 on them.
+        eq_kernel = K3[:, :, 1:2, 1:2] * t3 + K1 * t1  # The equivalent resultant central point of 3x3 kernel.
+        l2_loss_eq_kernel = (eq_kernel ** 2 / (
+                t3 ** 2 + t1 ** 2)).sum()  # Normalize for an L2 coefficient comparable to regular L2.
+        return l2_loss_eq_kernel + l2_loss_circle
 
     def get_equivalent_kernel_bias(self):
         kernel3x3, bias3x3 = self._fuse_bn_tensor(self.rbr_dense)
@@ -96,20 +133,25 @@ class RepN33(nn.Module):
             self.__delattr__('id_tensor')
         self.deploy = True
 
-def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1,
-         freeze_bn=False):
-    if freeze_bn:
-        return nn.Sequential(
-            nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
-                      padding=padding, dilation=dilation, bias=True),
-            FrozenBatchNorm2d(out_planes),
-            nn.ReLU(inplace=True))
-    else:
-        return nn.Sequential(
-            nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
-                      padding=padding, dilation=dilation, bias=True),
-            nn.BatchNorm2d(out_planes),
-            nn.ReLU(inplace=True))
+
+class SE(nn.Module):
+
+    def __init__(self, channels=64, reduction=1):
+        super(SE, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc1 = nn.Conv2d(channels, channels // reduction, kernel_size=1, padding=0)
+        self.relu = nn.ReLU(inplace=True)
+        self.fc2 = nn.Conv2d(channels // reduction, channels, kernel_size=1, padding=0)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        module_input = x
+        x = self.avg_pool(x)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.sigmoid(x)
+        return module_input * x
 
 
 class RepN33_SE_Center_Concat(nn.Module):
@@ -147,22 +189,6 @@ class RepN33_SE_Center_Concat(nn.Module):
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
-    def forward(self, x, gt_score_map=None):
-        """ Forward pass with input x. """
-        score_map_ctr, size_map, offset_map = self.get_score_map(x)
-        # assert gt_score_map is None
-        if gt_score_map is None:
-            bbox = self.cal_bbox(score_map_ctr, size_map, offset_map)
-        else:
-            bbox = self.cal_bbox(gt_score_map.unsqueeze(1), size_map, offset_map)
-
-        out = {'pred_boxes': bbox,
-               'score_map': score_map_ctr,
-               'size_map': size_map,
-               'offset_map': offset_map}
-
-        return out
-
     def get_score_map(self, x):
 
         def _sigmoid(x):
@@ -193,6 +219,22 @@ class RepN33_SE_Center_Concat(nn.Module):
         x_size4 = self.conv4_size(x_size3)
         score_map_size = self.conv5_size(x_size4)
         return _sigmoid(score_map_ctr), _sigmoid(score_map_size), score_map_offset
+
+    def forward(self, x, gt_score_map=None):
+        """ Forward pass with input x. """
+        score_map_ctr, size_map, offset_map = self.get_score_map(x)
+        # assert gt_score_map is None
+        if gt_score_map is None:
+            bbox = self.cal_bbox(score_map_ctr, size_map, offset_map)
+        else:
+            bbox = self.cal_bbox(gt_score_map.unsqueeze(1), size_map, offset_map)
+
+        out = {'pred_boxes': bbox,
+               'score_map': score_map_ctr,
+               'size_map': size_map,
+               'offset_map': offset_map}
+
+        return out
 
     def cal_bbox(self, score_map_ctr, size_map, offset_map, return_score=False):
         max_score, idx = torch.max(score_map_ctr.flatten(1), dim=1, keepdim=True)

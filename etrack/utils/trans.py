@@ -46,3 +46,4 @@ def selectROI(winname, img):
 @no_print_cv2
 def silentSelectROI(winname, img):
     return selectROI(winname, img)
+

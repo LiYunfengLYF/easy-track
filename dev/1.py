@@ -1,5 +1,11 @@
-from etrack import siamfc, run_sequence
+import torch
 
-tracker = siamfc()
+from etrack import starks50, run_sequence,quick_start,starkst50,starkst101
 
-run_sequence(tracker, seq_file=r'/media/liyunfeng/CV2/data/sot/otb/Basketball/img', select_roi=True)
+tracker = starkst101()
+seq_file =r'/home/liyunfeng/Downloads/SonarPolarizationLight/fusion/light/11_sonar15_mooringmine/Sensor1_OculusMD750d/image'
+# tracker.network.load_state_dict(torch.load(r'/home/liyunfeng/code/project2/Stark/checkpoints/train/stark_s/baseline/STARKS_ep0500.pth.tar')['net'])
+quick_start(tracker, seq_file=seq_file, speed=50)
+#
+
+from etrack import seqread

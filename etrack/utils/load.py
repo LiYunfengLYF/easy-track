@@ -30,7 +30,12 @@ def txtread(filename, delimiter=None, dtype=np.float64):
 
 
 def seqread(file, imgs_type='.jpg'):
-    output_list = sorted(img_filter(os.listdir(file), imgs_type), key=lambda x: int(x.split('.')[-2]))
+    try:
+        output_list = sorted(img_filter(os.listdir(file), imgs_type), key=lambda x: int(x.split('.')[-2]))
+    except ValueError:
+        output_list = sorted(img_filter(os.listdir(file), imgs_type),
+                             key=lambda x: int(x.split('.')[-2].split('_')[-1]))
+
     return [os.path.join(file, item) for item in output_list]
 
 

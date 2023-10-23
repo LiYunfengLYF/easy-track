@@ -8,15 +8,12 @@ from .utils import crop_and_resize
 
 
 class siamfc(Tracker):
-    def __init__(self, use_cuda=True):
-        super().__init__()
-        self.device = torch.device('cuda:0' if use_cuda else 'cpu')
-
-        self.network = SiamFC()
-        self.network.to(self.device)
-        self.network.eval()
-
+    def __init__(self, checkpoint_path=None, use_cuda=True):
+        super().__init__(checkpoint_path, use_cuda, 'siamfc')
         self.cfg = cfg()
+
+        self.network = SiamFC().to(self.device).eval()
+        self.load_checkpoint()
 
     @torch.no_grad()
     def init(self, image, bbox):
