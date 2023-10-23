@@ -1,14 +1,14 @@
 import cv2
 from tqdm import tqdm
-from .draw import draw_box
-from visual.tqdm_utils import tqdm_update
-from .load import imread, load_seq_result
-from .trans import decode_img_file, decode_txt_file, speed2waitkey
+from ..utils import draw_box
+from ..utils import tqdm_update
+from ..utils import imread, load_seq_result
+from ..utils import decode_img_file, decode_txt_file, speed2waitkey
 
-from .dataset.otb import otbDataset
-from .dataset.utb import utb180Dataset
-from .dataset.uot import uot100Dataset
-from .dataset.lasot import lasotDataset
+from ..utils.dataset import otbDataset
+from ..utils.dataset import utb180Dataset
+from ..utils.dataset import uot100Dataset
+from ..utils.dataset import lasotDataset
 
 
 def imshow(winname, image, waitkey=0):

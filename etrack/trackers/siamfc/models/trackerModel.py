@@ -1,6 +1,6 @@
 import torch.nn as nn
-from trackers.siamfc.models.backbone import AlexNetV1
-from trackers.siamfc.models.xcorr import xcorr
+from etrack.trackers.siamfc.models.backbone import AlexNetV1
+from etrack.trackers.siamfc.models.xcorr import xcorr
 
 
 class SiamFC(nn.Module):

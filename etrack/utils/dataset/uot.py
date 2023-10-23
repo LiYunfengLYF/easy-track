@@ -1,6 +1,5 @@
 import os
-from ..load import txtread
-from ..trans import imfile_str2list
+from ..load import txtread, seqread
 
 
 class uot100Dataset(object):
@@ -37,7 +36,7 @@ class uot100Dataset(object):
 
     def __getitem__(self, item):
         seq_info = self.seqs_info[item]
-        imgs = imfile_str2list(seq_info['imgs_dir'])
+        imgs = seqread(seq_info['imgs_dir'])
         gt_txt = txtread(seq_info['gt_dir'], delimiter=[',', '\t'])
 
         return seq_info['name'], imgs, gt_txt

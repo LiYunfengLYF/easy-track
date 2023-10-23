@@ -29,7 +29,16 @@ def txtread(filename, delimiter=None, dtype=np.float64):
         return ground_truth_rect
 
 
+def seqread(file, imgs_type='.jpg'):
+    output_list = sorted(img_filter(os.listdir(file), imgs_type), key=lambda x: int(x.split('.')[-2]))
+    return [os.path.join(file, item) for item in output_list]
+
+
 def load_seq_result(dataset_file, seq_name):
     seq_result_path = os.path.join(dataset_file, seq_name + '.txt')
     result = txtread(seq_result_path, [',', '\t'])
     return result
+
+
+def img_filter(imgs_list, extension_filter=r'.jpg'):
+    return list(filter(lambda file: file.endswith(extension_filter), imgs_list))

@@ -1,5 +1,6 @@
 import os
-from ..load import txtread
+from ..load import txtread,seqread
+
 
 
 class lasotextDataset(object):
@@ -41,7 +42,7 @@ class lasotextDataset(object):
 
     def __getitem__(self, item):
         seq_info = self.seqs_info[item]
-        imgs = [os.path.join(seq_info['imgs_dir'], i) for i in (os.listdir(seq_info['imgs_dir']))]
+        imgs = seqread(seq_info['imgs_dir'])
         gt_txt = txtread(seq_info['gt_dir'], delimiter=[',', '\t'])
 
         return seq_info['name'], imgs, gt_txt

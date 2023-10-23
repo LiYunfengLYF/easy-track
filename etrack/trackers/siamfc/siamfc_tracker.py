@@ -22,7 +22,7 @@ class siamfc(Tracker):
     def init(self, image, bbox):
         # convert box to 0-indexed and center based [y, x, h, w]
         bbox = np.array([bbox[1] - 1 + (bbox[3] - 1) / 2, bbox[0] - 1 + (bbox[2] - 1) / 2, bbox[3], bbox[2]],
-                       dtype=np.float32)
+                        dtype=np.float32)
         self.center, self.target_sz = bbox[:2], bbox[2:]
 
         # create hanning window
@@ -106,9 +106,9 @@ class siamfc(Tracker):
         self.x_sz *= scale
 
         # return 1-indexed and left-top based bounding box
-        box = np.array([
-            self.center[1] + 1 - (self.target_sz[1] - 1) / 2,
-            self.center[0] + 1 - (self.target_sz[0] - 1) / 2,
-            self.target_sz[1], self.target_sz[0]])
+        box = [float(self.center[1] + 1 - (self.target_sz[1] - 1) / 2),
+               float(self.center[0] + 1 - (self.target_sz[0] - 1) / 2),
+               float(self.target_sz[1]),
+               float(self.target_sz[0])]
 
-        return torch.from_numpy(box)
+        return box
