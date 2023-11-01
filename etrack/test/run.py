@@ -29,7 +29,7 @@ def quick_start(tracker, seq_file, speed=20, imgs_type='jpg'):
 def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, visual=False, speed=20, imgs_type='jpg',
                  select_roi=False):
     save_path = os.getcwd() if save_path is not None else save_path
-    select_roi = (True if gt_file is not None else False) or select_roi
+    select_roi = (True if gt_file is None else False) or select_roi
 
     imgs_list = seqread(seq_file, imgs_type=imgs_type)
     gt = txtread(gt_file) if gt_file is not None else None

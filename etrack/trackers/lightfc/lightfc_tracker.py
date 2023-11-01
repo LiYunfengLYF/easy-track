@@ -23,7 +23,7 @@ class lightfc(Tracker):
         self.feat_sz = self.cfg.search_size // self.cfg.stride
 
         # motion constrain
-        self.output_window = hann2d(torch.tensor([self.feat_sz, self.feat_sz]).long(), centered=True).cuda()
+        self.output_window = hann2d(torch.tensor([self.feat_sz, self.feat_sz]).long(), centered=True).to(self.device)
 
     def init(self, image, bbox):
         H, W, _ = image.shape

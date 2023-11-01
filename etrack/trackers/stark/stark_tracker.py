@@ -11,11 +11,9 @@ from .utils.stark_utils import Preprocessor, sample_target, merge_template_searc
 class starks50(Tracker):
     def __init__(self, checkpoint_path=None, use_cuda=True):
         super().__init__(checkpoint_path, use_cuda, 'starks50')
-
         self.cfg = cfg_s50()
-
         self.network = Starks50().to(self.device).eval()
-
+        self.load_checkpoint()
         self.preprocessor = Preprocessor()
         self.state = None
 
@@ -43,7 +41,6 @@ class starks50(Tracker):
             out_dict, _, _ = self.network.forward_transformer(seq_dict=seq_dict, run_box_head=True)
 
         pred_boxes = out_dict['pred_boxes'].view(-1, 4)
-        print(pred_boxes)
         # Baseline: Take the mean of all pred boxes as the final result
         pred_box = (pred_boxes.mean(dim=0) * self.cfg.search_size / resize_factor).tolist()  # (cx, cy, w, h) [0,1]
         # get the final box result
@@ -63,14 +60,11 @@ class starks50(Tracker):
 class starkst50(Tracker):
     def __init__(self, checkpoint_path=None, use_cuda=True, update_intervals=200):
         super().__init__(checkpoint_path, use_cuda, 'starkst50')
-
         self.cfg = cfg_st50()
-
         self.network = Starkst50().to(self.device).eval()
-
+        self.load_checkpoint()
         self.preprocessor = Preprocessor()
         self.state = None
-
         self.update_intervals = [update_intervals]
         self.num_extra_template = len(self.update_intervals)
 
@@ -134,17 +128,15 @@ class starkst50(Tracker):
         cy_real = cy + (cy_prev - half_side)
         return [cx_real - 0.5 * w, cy_real - 0.5 * h, w, h]
 
+
 class starkst101(Tracker):
     def __init__(self, checkpoint_path=None, use_cuda=True, update_intervals=200):
         super().__init__(checkpoint_path, use_cuda, 'starkst101')
-
-        self.cfg = cfg_st50()
-
-        self.network = Starkst50().to(self.device).eval()
-
+        self.cfg = cfg_st101()
+        self.network = Starkst101().to(self.device).eval()
+        self.load_checkpoint()
         self.preprocessor = Preprocessor()
         self.state = None
-
         self.update_intervals = [update_intervals]
         self.num_extra_template = len(self.update_intervals)
 

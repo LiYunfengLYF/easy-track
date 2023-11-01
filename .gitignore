@@ -15,5 +15,5 @@
 /data
 /.tag
 *.pth
-/dev
+/dev/etrack_checkpoints
 /lib
