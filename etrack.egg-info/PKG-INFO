@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: etrack
+Version: 0.1.5
+Summary: easy-track official API
+Home-page: https://github.com/LiYunfengLYF/easy-track
+Author: Yunfeng Li
+Author-email: liyunfeng@hrbeu.edu.en
+License: MIT
+Keywords: etrack,single Object Tracking,toolkit
+License-File: LICENSE
