@@ -1,4 +1,4 @@
-# easy-track
+# easy-track toolkit
 
 ## state
 
