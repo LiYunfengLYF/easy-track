@@ -17,3 +17,6 @@
 *.pth
 /dev/etrack_checkpoints
 /lib
+/dist
+/etrack.egg-info
+/build

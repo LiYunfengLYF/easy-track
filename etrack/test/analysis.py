@@ -59,9 +59,6 @@ def calc_seq_performace(results_boxes, gt_boxes):
 
     succ_curve, prec_curve, norm_prec_curve = calc_curves(ious, center_errors, norm_enter_errors)
 
-    # succ_curve = np.mean(succ_curve)
-    # prec_curve = np.mean(prec_curve)
-    # norm_prec_curve = np.mean(norm_prec_curve)
 
     succ_score = np.mean(succ_curve)
     prec_score = prec_curve[20]
@@ -72,8 +69,16 @@ def calc_seq_performace(results_boxes, gt_boxes):
     return succ_score, prec_score, norm_prec_score, succ_rate
 
 
-def report_seq_performance(gt_file, results_file=None):
-    results_file = os.getcwd() if results_file is None else results_file
+def report_seq_performance(gt_file, results_file):
+    """
+    Description
+        calc Success Score, Precision Score, Norm Precision Score, Success Rate of on a sequence
+
+    Params:
+        gt_file:        str
+        results_file:   str
+
+    """
 
     results_boxes = txtread(results_file)
     gt_boxes = txtread(gt_file)

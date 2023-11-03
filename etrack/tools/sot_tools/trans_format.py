@@ -4,12 +4,27 @@ import torch
 from tqdm import tqdm
 
 
-def trans_txt_format(txt_file, out_file=None, format=',', new_format=None, with_time=True):
-    out_file = txt_file if out_file is None else out_file
-    new_format = format if new_format is None else new_format
+def trans_txt_delimiter(txt_file, out_file=None, delimiter=',', new_delimiter=None, with_time=True):
+    """
+    Description
+        transfer the delimiter of txt and save txt in out_file
+        if out_file is None, out_file = txt_file
+        if new_delimiter is None, new_delimiter = delimiter
+        if with time is True, copy *_time.txt to out_file
 
-    assert format in ['\t', ',']
-    assert new_format in ['\t', ',']
+    Params:
+        txt_file:   source txt file
+        out_file:   save txt file
+        format:     ',' or '\t'
+        new_format: ',' or '\t'
+        with_time:  True or False
+
+    """
+    out_file = txt_file if out_file is None else out_file
+    new_delimiter = format if new_delimiter is None else new_delimiter
+
+    assert delimiter in ['\t', ',']
+    assert new_delimiter in ['\t', ',']
 
     if with_time:
         result_item = []
@@ -29,13 +44,27 @@ def trans_txt_format(txt_file, out_file=None, format=',', new_format=None, with_
         with open(result, 'r') as f:
             lines = f.readlines()
             for line in lines:
-                sline = line.replace(format, new_format)
+                sline = line.replace(delimiter, new_delimiter)
                 new_lines.append(sline)
         with open(save_results[idx], 'w') as f:
             f.writelines(new_lines)
 
 
-def trans_checkpoint_keys(checkpoint_file, out_file=None, name=None, key=None):
+def extract_weights_from_checkpoint(checkpoint_file, out_file=None, name=None, key=None):
+    """
+    Description
+        extract model's weight from checkpoint
+        if out_file is None, save weights to current file
+        if name is None, use current checkpoint name
+        if key is None, use default names: 'net', 'network', 'model'
+
+    Params:
+        checkpoint_file:    checkpoint file
+        out_file:           save weight file
+        name:               save name, str type
+        key:                key name, str type
+
+    """
     out_file = os.getcwd() if out_file is None else out_file
     state_dict = []
 
@@ -77,6 +106,16 @@ def trans_checkpoint_keys(checkpoint_file, out_file=None, name=None, key=None):
 
 
 def show_checkpoint_keys(checkpoint_file):
+    """
+    Description
+        show checkpoint keys
+
+    Params:
+        checkpoint_file:    checkpoint file
+
+    """
+
+
     try:
         state_dict = torch.load(checkpoint_file)
     except Exception as e:
@@ -87,6 +126,3 @@ def show_checkpoint_keys(checkpoint_file):
     for key in state_dict:
         print('\t',key)
 
-
-if __name__ == '__main__':
-    trans_txt_format('a', 'n')

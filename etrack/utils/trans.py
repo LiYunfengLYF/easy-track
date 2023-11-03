@@ -35,6 +35,17 @@ def check_is_img(item):
 
 
 def speed2waitkey(speed):
+    """
+    Description
+        trans fps to waitkey of cv2
+
+    Params:
+        speed:      fps, int
+
+    return:
+        waitkey:    int
+
+    """
     if speed == 0:
         return 0
     else:
@@ -42,6 +53,19 @@ def speed2waitkey(speed):
 
 
 def selectROI(winname, img):
+    """
+    Description
+        selectROI is an extension of cv2.selectROI
+        input image is RGB rather BGR
+
+    Params:
+        winname:    name
+        img:        np.array
+
+    return:
+        bbox:       [x,y,w,h]
+
+    """
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     bbox = cv2.selectROI(windowName=winname, img=img)
     return bbox
@@ -53,6 +77,20 @@ def silentSelectROI(winname, img):
 
 
 def img2tensor(img, device='cuda:0'):
+    """
+    Description
+        transfer an img to a tensor
+        mean: [0.485, 0.456, 0.406]
+        std:  [0.229, 0.224, 0.225]
+
+    Params:
+        img:       np.array
+        device:    default is 'cuda:0'
+
+    return:
+        Tensor:    torch.tensor(1,3,H,W)
+
+    """
     mean = torch.tensor([0.485, 0.456, 0.406]).view((1, 3, 1, 1)).cuda()
     std = torch.tensor([0.229, 0.224, 0.225]).view((1, 3, 1, 1)).cuda()
     img_tensor = torch.tensor(img).to(device).float().permute((2, 0, 1)).unsqueeze(dim=0)

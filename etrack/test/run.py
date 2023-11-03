@@ -5,11 +5,23 @@ import numpy as np
 from tqdm import tqdm
 
 from .analysis import calc_seq_performace
-from ..visual import imshow, close_cv2_window
-from ..utils import imread, draw_box, speed2waitkey, selectROI, silentSelectROI, txtread, seqread
+from ..utils import imread, draw_box, speed2waitkey, selectROI, silentSelectROI, txtread, seqread, imshow, \
+    close_cv2_window
 
 
-def quick_start(tracker, seq_file, speed=20, imgs_type='jpg'):
+def quick_start(tracker, seq_file, speed=20, imgs_type='.jpg'):
+    """
+    Description
+        quick_start aim to help user to quickly observe the results of the tracker on an image sequence.
+        It manually selects the initial bounding box and show results in each image by using blue bounding box.
+
+    Params:
+        tracker:
+        seq_file:
+        speed:      FPS speed, default = 20
+        imgs_type:  image type, default = '.jpg'
+
+    """
     imgs_list = seqread(seq_file, imgs_type=imgs_type)
 
     for num, img_dir in enumerate(imgs_list):
@@ -29,8 +41,19 @@ def quick_start(tracker, seq_file, speed=20, imgs_type='jpg'):
         imshow('quick_start', image, waitkey=speed2waitkey(speed))
 
 
-def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, visual=False, speed=20, imgs_type='jpg',
+def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, visual=False, speed=20, imgs_type='.jpg',
                  select_roi=False, report_performance=True):
+    """
+    Description
+
+
+    Params:
+        tracker:
+        seq_file:
+        speed:      FPS speed, default = 20
+        imgs_type:  image type, default = '.jpg'
+    """
+
     save_path = os.getcwd() if save_path is not None else save_path
 
     select_roi = (True if gt_file is None else False) or select_roi

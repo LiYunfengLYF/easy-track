@@ -1,1 +1,0 @@
-from .trackerModel import SiamFC,SiamFC_deploy
