@@ -1,11 +1,8 @@
 import os
-
-import cv2
 import numpy as np
 from tqdm import tqdm
-
 from .analysis import calc_seq_performace
-from ..utils import imread, draw_box, speed2waitkey, selectROI, silentSelectROI, txtread, seqread, imshow, \
+from ..utils import imread, draw_box, speed2waitkey, selectROI, txtread, seqread, imshow, \
     close_cv2_window
 
 
@@ -72,7 +69,7 @@ def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, vi
 
         if num == 0:
             if select_roi:
-                init_box = result = silentSelectROI(winname, image)
+                init_box = result = selectROI(winname, image)
                 close_cv2_window(winname) if visual is False else None
             else:
                 init_box = result = gt[0]

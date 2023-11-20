@@ -1,11 +1,14 @@
 import cv2
 from tqdm import tqdm
-from ..utils import draw_box, tqdm_update, imread, load_seq_result, decode_img_file, decode_txt_file, speed2waitkey
+
+from .load import easy_seqread, easy_txtread
+from .others import tqdm_update
+from ..utils import draw_box, imread, load_seq_result, speed2waitkey
 
 from ..utils.dataset import otbDataset, utb180Dataset, uot100Dataset, lasotDataset
 
 
-def imshow(winname, image, waitkey=0):
+def imshow(winname, image, waitkey=0, resize=None):
     """
     Description
         imshow is an extension of cv2.imshow
@@ -15,12 +18,17 @@ def imshow(winname, image, waitkey=0):
         winname:    str
         image:      np.array
         waitkey:    default is 0
+        resize:     tuple
 
     """
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     cv2.namedWindow(winname, cv2.WINDOW_FREERATIO)
+
+    if resize is not None :
+        cv2.resizeWindow(winname, resize)
     cv2.imshow(winname, image)
-    cv2.waitKey(waitkey)
+    key = cv2.waitKey(waitkey)
+    return key
 
 
 def seqshow(imgs_file, imgs_type=r'jpg', result_file=None, gt_file=None, show_gt=True, speed=20, tracker_name='',
@@ -47,9 +55,9 @@ def seqshow(imgs_file, imgs_type=r'jpg', result_file=None, gt_file=None, show_gt
     """
 
     # decode images, tracker's results and gt
-    imgs_list = decode_img_file(imgs_file, imgs_type)
-    result = decode_txt_file(result_file) if result_file is not None else None
-    gt = decode_txt_file(gt_file) if gt_file is not None else None
+    imgs_list = easy_seqread(imgs_file, imgs_type)
+    result = easy_txtread(result_file) if result_file is not None else None
+    gt = easy_txtread(gt_file) if gt_file is not None else None
 
     show_name = tracker_name + '-' + seq_name
     for num, img_dir in enumerate(imgs_list):
@@ -189,3 +197,6 @@ def close_cv2_window(winname):
 
     """
     cv2.destroyWindow(winname)
+
+def greenprint(text):
+    print(f"\033[92m{text}\033[0m")

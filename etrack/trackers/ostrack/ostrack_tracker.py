@@ -98,7 +98,7 @@ class ostrack384(Tracker):
     def __init__(self, checkpoint_path=None, use_cuda=True):
         super().__init__(checkpoint_path, use_cuda, 'ostrack384')
 
-        self.cfg = cfg_256()
+        self.cfg = cfg_384()
         self.network = OSTrack384().to(self.device).eval()
         # self.load_checkpoint()
 

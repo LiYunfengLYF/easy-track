@@ -20,3 +20,7 @@ def draw_box(image, box, color, thickness):
     brx, bry = int(box[0] + box[2]), int(box[1] + box[3])
     image = cv2.rectangle(image, (tlx, tly), (brx, bry), color=color, thickness=thickness)
     return image
+
+
+def draw_txt(image, text, org=(20, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=2, color=(0, 0, 255), thickness=3):
+    return cv2.putText(image, text, org, fontFace, fontScale, color, thickness)

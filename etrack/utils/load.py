@@ -1,5 +1,6 @@
 import os
 import cv2
+import pickle
 import numpy as np
 
 
@@ -20,6 +21,11 @@ def imread(filename):
         return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     except:
         raise print(f'{filename} is wrong')
+
+def imwrite(filename: str, image):
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(filename, image)
+
 
 
 def txtread(filename, delimiter=None, dtype=np.float64):
@@ -55,6 +61,15 @@ def txtread(filename, delimiter=None, dtype=np.float64):
         return ground_truth_rect
 
 
+def easy_txtread(file):
+    if type(file) is str:
+        return txtread(file)
+    elif type(file) in [list, tuple]:
+        return file
+    else:
+        raise print(f'Unknown file type: {type(file)}')
+
+
 def seqread(file, imgs_type='.jpg'):
     """
     Description
@@ -79,6 +94,31 @@ def seqread(file, imgs_type='.jpg'):
                              key=lambda x: int(x.split('.')[-2].split('_')[-1]))
 
     return [os.path.join(file, item) for item in output_list]
+
+
+def easy_seqread(file, imgs_type='.jpg'):
+    if type(file) is str:
+        return seqread(file, imgs_type)
+    elif type(file) in [list, tuple]:
+        return file
+    else:
+        raise print(f'Unknown file type: {type(file)}')
+
+
+def pklread(file):
+    if os.path.exists(file):
+        f_read = open(file, 'rb')
+        pkl = pickle.load(f_read)
+        f_read.close()
+    else:
+        raise f'{file} is not exit!!!'
+    return pkl
+
+
+def pklwrite(file, pkl):
+    f_write = open(file, 'wb')
+    pickle.dump(pkl, f_write)
+    f_write.close()
 
 
 def load_seq_result(dataset_file, seq_name):

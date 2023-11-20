@@ -1,79 +1,36 @@
 import os
 import cv2
+import torch
 import shutil
 import logging
-
-import torch
 from tqdm import tqdm
-from .utils.MobileNetV2 import mobilenet_v2
+from .utils import mobilenet_v2
 from ..utils import imread, seqread, img2tensor
 
-
-def trans_imgs_order_name(file, save_file, sort=True, imgs_format='.jpg', preread=True, format_name=False, width=4,
-                    start=1, end=None, ):
+def remove_timetxt(results_file):
     """
     Description
-        transfer image into an order name, and save in save_file
-        if sort is False, it will directly read images. The original order of imgs may not be preserved
-        if preread is False, it will directly copy and paste, image will not be opened
-        if format_name is True, images' name is like 0001.jpg, 0002.jpg (width=4), ... else 1.jpg, 2.jpg, ...
+        Remove *_time.txt files from results_file
 
     Params:
-        file:           str
-        save_file:      str
-        sort:           True or False
-        imgs_format:    str, default is '.jpg'
-        preread:        True or False
-        format_name:    True or False
-        width:          int
-        start:          int
-        end:            int
+        results_file:   file path
 
     """
-    assert imgs_format in ['.jpg', '.png', '.jpeg']
+    txt_list = os.listdir(results_file)
+    remove_list = []
 
-    if not os.path.isdir(file):
-        raise 'Input file is not a dir, please check it !!!'
+    for item in txt_list:
+        if item.split('.')[-2].split('_')[-1] == 'time':
+            remove_list.append(item)
 
-    if not os.path.exists(save_file):
-        os.makedirs(save_file)
+    for i in tqdm(range(len(remove_list)), total=len(remove_list), desc='removing the *_time.txt: ', position=1):
+        os.remove(os.path.join(results_file, remove_list[i]))
 
-    if sort:
-        file_items = seqread(file, imgs_format)
-        if len(file_items) == 0:
-            logging.warning(f'There is no images with {imgs_format}, please check it or set sort=False')
-        elif len(file_items) != len(os.listdir(file)):
-            logging.warning(f'There may be different format of images, please check it')
-    else:
-        file_items = [os.path.join(file, item) for item in os.listdir(file)]
-    end = len(file_items) if end is None else end
-
-    if format_name:
-        name_list = [f'{i:0{width}}' + imgs_format for i in range(start, end + 1)]
-    else:
-        name_list = [str(i) + imgs_format for i in range(start, end + 1)]
-
-    save_items = [os.path.join(save_file, item) for item in name_list]
-    if not preread:
-        logging.warning('Images are converted directly and will not be opened ！！！')
-        logging.warning('It is recommended to set: preread = True')
-
-    for i in tqdm(range(end + 1 - start), total=(end + 1 - start), desc='running: '):
-        if preread:
-            try:
-                images = cv2.imread(file_items[i])
-                cv2.imwrite(save_items[i], images)
-            except Exception as E:
-                print(E)
-                raise f'Error at item {file_items[i]}, please check it !!!'
-        else:
-            shutil.copy(file_items[i], save_items[i])
-
-    print(f"Finish trans image from {file} to {save_file}")
+    print(f'Finish remove *_time.txt in {results_file}')
 
 
 def remove_same_img(file, save_file, checkpoint_path=None, device='cuda:0', resize=(320, 640), thred=0.4,
-                    show_same=False):
+                    show_same=False, start=1):
     """
     Description
         Remove same images in file and sort and save the rest images in save file
@@ -136,7 +93,7 @@ def remove_same_img(file, save_file, checkpoint_path=None, device='cuda:0', resi
     for index in sorted(remove_list, reverse=True):
         imgs_list.pop(index)
 
-    save_list = [os.path.join(save_file, str(i + 1) + '.jpg') for i in range(len(imgs_list))]
+    save_list = [os.path.join(save_file, str(i + start) + '.jpg') for i in range(len(imgs_list))]
 
     for i in range(len(imgs_list)):
         shutil.copy(imgs_list[i], save_list[i])

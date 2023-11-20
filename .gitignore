@@ -7,6 +7,7 @@
 *.vscode
 *.zip
 *.7z
+*.pth.tar
 *.pytest_cache
 *.bin
 *.csv
@@ -20,3 +21,4 @@
 /dist
 /etrack.egg-info
 /build
+/dev

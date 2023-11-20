@@ -16,7 +16,7 @@ class cfg_256:
         self.return_inter = False
         self.return_stages = []
         self.sep_seg = False
-        self.ce_template_range =r'CTR_POINT'
+        self.ce_template_range = r'CTR_POINT'
 
         # head
         self.head_type = r'CENTER'
@@ -36,6 +36,7 @@ class cfg_384:
         self.drop_path_rate = 0.1
         self.ce_loc = [3, 6, 9]
         self.ce_keep_ratio = [0.7, 0.7, 0.7]
+        self.ce_template_range = r'CTR_POINT'
         self.stride = 16
         self.cat_mode = 'direct'
         self.return_inter = False
