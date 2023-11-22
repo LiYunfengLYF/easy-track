@@ -100,7 +100,7 @@ class ostrack384(Tracker):
 
         self.cfg = cfg_384()
         self.network = OSTrack384().to(self.device).eval()
-        # self.load_checkpoint()
+        self.load_checkpoint()
 
         self.preprocessor = Preprocessor()
         self.state = None

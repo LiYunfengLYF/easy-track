@@ -117,7 +117,7 @@ def OSTrack256():
 
 
 def OSTrack384():
-    cfg = cfg_256()
+    cfg = cfg_384()
 
     if cfg.backbone_type == 'vit_base_patch16_224_ce':
         backbone = vit_base_patch16_224_ce(False, drop_path_rate=cfg.drop_path_rate,

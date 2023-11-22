@@ -55,8 +55,8 @@ def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, vi
 
     select_roi = (True if gt_file is None else False) or select_roi
 
-    imgs_list = seqread(seq_file, imgs_type=imgs_type)
-    gt = txtread(gt_file) if gt_file is not None else None
+    imgs_list = seqread(seq_file, imgs_type=imgs_type) if seq_file is str else seq_file
+    gt = txtread(gt_file) if gt_file is str else gt_file
 
     result_list = [] if save or report_performance else None
     try:
@@ -99,3 +99,4 @@ def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, vi
         print(f'\tPrecision Score:\t\t\t{round(prec_score, 2)}')
         print(f'\tNorm Precision Score:\t\t{round(norm_prec_score, 2)}')
         print(f'\tSuccess Rate:\t\t\t\t{round(succ_rate, 2)}')
+        return succ_score, prec_score, norm_prec_score, succ_rate

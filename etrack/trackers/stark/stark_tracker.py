@@ -1,7 +1,5 @@
-from copy import deepcopy
-
-import cv2
 import torch
+from copy import deepcopy
 from ..tracker import Tracker
 from .config import cfg_s50, cfg_st50, cfg_st101
 from .models import Starks50, Starkst50, Starkst101

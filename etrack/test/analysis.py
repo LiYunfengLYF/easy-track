@@ -30,14 +30,15 @@ def calc_iou(pred_bb, anno_bb):
 
 def calc_curves(ious, center_errors, norm_center_errors):
     ious = np.asarray(ious, float)[:, np.newaxis]
+
     center_errors = np.asarray(center_errors, float)[:, np.newaxis]
     norm_center_errors = np.asarray(norm_center_errors, float)[:, np.newaxis]
 
     thr_iou = np.linspace(0, 1, 21)[np.newaxis, :]
     thr_ce = np.arange(0, 51)[np.newaxis, :]
-    thr_ce_norm = np.arange(0, 51)[np.newaxis, :] / 50
+    thr_ce_norm = np.arange(0, 51)[np.newaxis, :] / 100.0
 
-    bin_iou = np.greater_equal(ious, thr_iou)
+    bin_iou = np.greater(ious, thr_iou)
     bin_ce = np.less_equal(center_errors, thr_ce)
     bin_norm_ce = np.less_equal(norm_center_errors, thr_ce_norm)
 
@@ -59,14 +60,11 @@ def calc_seq_performace(results_boxes, gt_boxes):
 
     succ_curve, prec_curve, norm_prec_curve = calc_curves(ious, center_errors, norm_enter_errors)
 
-
-    succ_score = np.mean(succ_curve)
+    auc_score = np.mean(succ_curve)
     prec_score = prec_curve[20]
     norm_prec_score = norm_prec_curve[20]
 
-    succ_rate = succ_curve[21 // 2]
-
-    return succ_score, prec_score, norm_prec_score, succ_rate
+    return auc_score, prec_score, norm_prec_score
 
 
 def report_seq_performance(gt_file, results_file):
@@ -83,9 +81,8 @@ def report_seq_performance(gt_file, results_file):
     results_boxes = txtread(results_file)
     gt_boxes = txtread(gt_file)
 
-    succ_score, prec_score, norm_prec_score, succ_rate = calc_seq_performace(results_boxes, gt_boxes)
+    succ_score, prec_score, norm_prec_score = calc_seq_performace(results_boxes, gt_boxes)
     print(f'Performance: ')
-    print(f'\tSuccess Score:\t\t\t\t{round(succ_score, 2)}')
+    print(f'\tAUC:\t\t\t\t{round(succ_score, 2)}')
     print(f'\tPrecision Score:\t\t\t{round(prec_score, 2)}')
     print(f'\tNorm Precision Score:\t\t{round(norm_prec_score, 2)}')
-    print(f'\tSuccess Rate:\t\t\t\t{round(succ_rate, 2)}')
