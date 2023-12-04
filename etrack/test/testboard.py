@@ -1,7 +1,6 @@
 import cv2
 import logging
 import numpy as np
-
 from ..utils import imread, draw_box, close_cv2_window, selectROI
 
 

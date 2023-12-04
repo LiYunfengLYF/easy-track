@@ -279,9 +279,7 @@ def _max_by_axis(the_list):
     return maxes
 
 def nested_tensor_from_tensor(tensor1: Tensor):
-    # TODO make this more general
     if tensor1[0].ndim == 3:
-        # TODO make it support different-sized images
         max_size = _max_by_axis([list(img.shape) for img in tensor1])
         # min_size = tuple(min(s) for s in zip(*[img.shape for img in tensor_list]))
         batch_shape = [len(tensor1)] + max_size
@@ -298,9 +296,7 @@ def nested_tensor_from_tensor(tensor1: Tensor):
     return NestedTensor(tensor, mask)
 
 def nested_tensor_from_tensor_2(tensor1: Tensor):
-    # TODO make this more general
     if tensor1[0].ndim == 3:
-        # TODO make it support different-sized images
         max_size = _max_by_axis([list(img.shape) for img in tensor1])
         # min_size = tuple(min(s) for s in zip(*[img.shape for img in tensor_list]))
         batch_shape = [len(tensor1)] + max_size
@@ -317,9 +313,7 @@ def nested_tensor_from_tensor_2(tensor1: Tensor):
     return NestedTensor(tensor, mask)
 
 def nested_tensor_from_tensor_list(tensor_list: List[Tensor]):
-    # TODO make this more general
     if tensor_list[0].ndim == 3:
-        # TODO make it support different-sized images
         max_size = _max_by_axis([list(img.shape) for img in tensor_list])
         # min_size = tuple(min(s) for s in zip(*[img.shape for img in tensor_list]))
         batch_shape = [len(tensor_list)] + max_size

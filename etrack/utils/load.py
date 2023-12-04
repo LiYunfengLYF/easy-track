@@ -1,20 +1,14 @@
 import os
 import cv2
+import json
 import pickle
 import numpy as np
 
 
-def imread(filename):
+def imread(filename: str) -> np.array:
     """
     Description
-        imread is an extension of cv2.imread, which returns RGB images
-
-    Params:
-        filename:   the path of image
-
-    Return:
-        image:      np.array
-
+        imread is an easy extension of cv2.imread, which returns RGB images
     """
     try:
         image = cv2.imread(filename)
@@ -22,26 +16,17 @@ def imread(filename):
     except:
         raise print(f'{filename} is wrong')
 
-def imwrite(filename: str, image):
+
+def imwrite(filename: str, image: np.array):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     cv2.imwrite(filename, image)
 
 
-
-def txtread(filename, delimiter=None, dtype=np.float64):
+def txtread(filename: str, delimiter: [str, list] = None) -> np.ndarray:
     """
     Description
         txtread is an extension of np.loadtxt, support ',' and '\t' delimiter.
         The original implementation method is in the pytracking library at https://github.com/visionml/pytracking
-
-    Params:
-        filename:           the path of txt
-        delimiter:          default is [',','\t']
-        dtype:              default is np.float64
-
-    Return:
-        ground_truth_rect:  np.array(n,4), n is length of results
-
     """
 
     if delimiter is None:
@@ -50,18 +35,18 @@ def txtread(filename, delimiter=None, dtype=np.float64):
     if isinstance(delimiter, (tuple, list)):
         for d in delimiter:
             try:
-                ground_truth_rect = np.loadtxt(filename, delimiter=d, dtype=dtype)
+                ground_truth_rect = np.loadtxt(filename, delimiter=d, dtype=np.float64)
                 return ground_truth_rect
             except:
                 pass
 
         raise Exception('Could not read file {}'.format(filename))
     else:
-        ground_truth_rect = np.loadtxt(filename, delimiter=delimiter, dtype=dtype)
+        ground_truth_rect = np.loadtxt(filename, delimiter=delimiter, dtype=np.float64)
         return ground_truth_rect
 
 
-def easy_txtread(file):
+def easy_txtread(file: [str, list, tuple]):
     if type(file) is str:
         return txtread(file)
     elif type(file) in [list, tuple]:
@@ -70,7 +55,7 @@ def easy_txtread(file):
         raise print(f'Unknown file type: {type(file)}')
 
 
-def seqread(file, imgs_type='.jpg'):
+def seqread(file: str, imgs_type='.jpg'):
     """
     Description
         Seqread reads all image items in the file and sorts them by numerical name
@@ -96,16 +81,20 @@ def seqread(file, imgs_type='.jpg'):
     return [os.path.join(file, item) for item in output_list]
 
 
-def easy_seqread(file, imgs_type='.jpg'):
+def easy_seqread(file: [str, list, tuple, np.ndarray], imgs_type: str = '.jpg'):
     if type(file) is str:
         return seqread(file, imgs_type)
-    elif type(file) in [list, tuple]:
+    elif type(file) in [list, tuple, np.ndarray]:
         return file
     else:
         raise print(f'Unknown file type: {type(file)}')
 
 
-def pklread(file):
+def pklread(file: str) -> dict:
+    """
+    Description
+        pklread is an easy extension of pickle.load
+    """
     if os.path.exists(file):
         f_read = open(file, 'rb')
         pkl = pickle.load(f_read)
@@ -115,29 +104,39 @@ def pklread(file):
     return pkl
 
 
-def pklwrite(file, pkl):
+def pklwrite(file: str, pkl: dict):
+    """
+    Description
+        pklwrite is an easy extension of pickle.dump
+    """
     f_write = open(file, 'wb')
     pickle.dump(pkl, f_write)
     f_write.close()
 
 
-def load_seq_result(dataset_file, seq_name):
+def jsonread(file: str) -> dict:
+    """
+    Description
+        jsonread is an easy extension of json.loads
+    """
+    f = open(file, 'r')
+    content = f.read()
+    raw_meta = json.loads(content)
+    f.close()
+    return raw_meta
+
+
+def load_seq_result(dataset_file: str, seq_name: str) -> np.ndarray:
     seq_result_path = os.path.join(dataset_file, seq_name + '.txt')
     result = txtread(seq_result_path, [',', '\t'])
     return result
 
 
-def img_filter(imgs_list, extension_filter=r'.jpg'):
+def img_filter(imgs_list: [str, list], extension_filter: str = r'.jpg') -> list:
     """
     Description
         img_filter retains items in the specified format in the input list
-
     Params:
-        imgs_list:          List of image path
         extension_filter:   default is '.jpg'
-
-    Return:
-        List of images path  with extension
-
     """
     return list(filter(lambda file: file.endswith(extension_filter), imgs_list))

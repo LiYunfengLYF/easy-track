@@ -1,5 +1,5 @@
 import torch
-
+import numpy as np
 from ..tracker import Tracker
 from .config import cfg_256, cfg_384
 from .models import OSTrack256, OSTrack384
@@ -16,7 +16,6 @@ class ostrack256(Tracker):
         self.network = OSTrack256().to(self.device).eval()
         self.load_checkpoint()
 
-
         self.preprocessor = Preprocessor()
         self.state = None
 
@@ -25,7 +24,7 @@ class ostrack256(Tracker):
         # motion constrain
         self.output_window = hann2d(torch.tensor([self.feat_sz, self.feat_sz]).long(), centered=True).to(self.device)
 
-    def init(self, image, bbox):
+    def init(self, image: np.array, bbox: list) -> None:
         z_patch_arr, resize_factor, z_amask_arr = sample_target(image, bbox, self.cfg.template_factor,
                                                                 output_sz=self.cfg.template_size)
         template = self.preprocessor.process(z_patch_arr)
@@ -41,7 +40,7 @@ class ostrack256(Tracker):
         # save states
         self.state = bbox
 
-    def track(self, image, info: dict = None):
+    def track(self, image: np.array) -> list:
         H, W, _ = image.shape
         x_patch_arr, resize_factor, x_amask_arr = sample_target(image, self.state, self.cfg.search_factor,
                                                                 output_sz=self.cfg.search_size)  # (x1, y1, w, h)

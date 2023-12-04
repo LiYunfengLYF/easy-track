@@ -1,19 +1,12 @@
 import cv2
+import numpy as np
 
 
-def selectROI(winname: str, img, resize=None):
+def selectROI(winname: str, img: np.array, resize: [list, tuple]) -> list:
     """
     Description
-        selectROI is an extension of cv2.selectROI
+        selectROI is an easy extension of cv2.selectROI
         input image is RGB rather BGR
-
-    Params:
-        winname:    name
-        img:        np.array
-
-    return:
-        bbox:       [x,y,w,h]
-
     """
 
     if resize is not None:
@@ -25,7 +18,12 @@ def selectROI(winname: str, img, resize=None):
     return bbox
 
 
-def flip_img(image, horizontal=False, vertical=False):
+def flip_img(image: np.array, horizontal: bool = False, vertical: bool = False) -> np.array:
+    """
+    Description
+        flip_img is an easy extension of cv2.flip
+        input image is RGB rather BGR
+    """
     if horizontal:
         image = cv2.flip(image, 1)
     if vertical:
@@ -33,11 +31,15 @@ def flip_img(image, horizontal=False, vertical=False):
     return image
 
 
-def clahe(image, clipLimit=2.0, tileGridSize=(8, 8)):
+def clahe(image: np.array, clipLimit: int = 2.0, tileGridSize: tuple = (8, 8)) -> np.array:
+    """
+    Description
+        clahe is an easy implement of CLAHE of cv2
+        input image include (R,G,B) and (B,G,R)
+    """
     B, G, R = cv2.split(image)
     clahe = cv2.createCLAHE(clipLimit=clipLimit, tileGridSize=tileGridSize)
+    clahe_R = clahe.apply(R)
     clahe_B = clahe.apply(B)
     clahe_G = clahe.apply(G)
-    clahe_R = clahe.apply(R)
-    image = cv2.merge((clahe_B, clahe_G, clahe_R))
-    return image
+    return cv2.merge((clahe_B, clahe_G, clahe_R))

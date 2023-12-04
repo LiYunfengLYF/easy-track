@@ -16,7 +16,7 @@ class siamfc(Tracker):
         self.load_checkpoint()
 
     @torch.no_grad()
-    def init(self, image, bbox):
+    def init(self, image: np.array, bbox: list) -> None:
         # convert box to 0-indexed and center based [y, x, h, w]
         bbox = np.array([bbox[1] - 1 + (bbox[3] - 1) / 2, bbox[0] - 1 + (bbox[2] - 1) / 2, bbox[3], bbox[2]],
                         dtype=np.float32)
@@ -53,7 +53,7 @@ class siamfc(Tracker):
         self.kernel = self.network.backbone(z)
 
     @torch.no_grad()
-    def track(self, image):
+    def track(self, image: np.array) -> list:
         # search images
         x = [crop_and_resize(
             image, self.center, self.x_sz * f,

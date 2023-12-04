@@ -1,6 +1,5 @@
-import math
-
 import cv2
+import math
 import torch
 import numpy as np
 from .config import cfg_n4
@@ -23,7 +22,7 @@ class transtn4(Tracker):
         self.std = [0.229, 0.224, 0.225]
         self.inplace = False
 
-    def init(self, image, bbox):
+    def init(self, image: np.array, bbox: list) -> None:
         self.frame_num = 1
 
         self.center_pos = np.array([bbox[0] + bbox[2] / 2, bbox[1] + bbox[3] / 2])
@@ -43,7 +42,7 @@ class transtn4(Tracker):
         z_crop[0] = tvisf.normalize(z_crop[0], self.mean, self.std, self.inplace)
         self.network.template(z_crop)
 
-    def track(self, image):
+    def track(self, image: np.array) -> list:
         w_x = self.size[0] + (4 - 1) * ((self.size[0] + self.size[1]) * 0.5)
         h_x = self.size[1] + (4 - 1) * ((self.size[0] + self.size[1]) * 0.5)
         s_x = math.ceil(math.sqrt(w_x * h_x))

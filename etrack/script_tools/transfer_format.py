@@ -2,7 +2,8 @@ import os
 from tqdm import tqdm
 
 
-def trans_txt_delimiter(txt_file, out_file=None, delimiter=',', new_delimiter=None, with_time=True):
+def trans_txt_delimiter(txt_file: str, out_file: str = None, delimiter: str = ',', new_delimiter: str = None,
+                        with_time: bool = True) -> None:
     """
     Description
         transfer the delimiter of txt and save txt in out_file

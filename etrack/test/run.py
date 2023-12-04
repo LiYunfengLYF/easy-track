@@ -55,8 +55,9 @@ def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, vi
 
     select_roi = (True if gt_file is None else False) or select_roi
 
-    imgs_list = seqread(seq_file, imgs_type=imgs_type) if seq_file is str else seq_file
-    gt = txtread(gt_file) if gt_file is str else gt_file
+    imgs_list = seqread(seq_file, imgs_type=imgs_type) if isinstance(seq_file, str) else seq_file
+
+    gt = txtread(gt_file) if isinstance(seq_file, str) else gt_file
 
     result_list = [] if save or report_performance else None
     try:

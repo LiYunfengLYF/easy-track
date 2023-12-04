@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from copy import deepcopy
 from ..tracker import Tracker
 from .config import cfg_s50, cfg_st50, cfg_st101
@@ -15,7 +16,7 @@ class starks50(Tracker):
         self.preprocessor = Preprocessor()
         self.state = None
 
-    def init(self, image, bbox):
+    def init(self, image: np.array, bbox: list) -> None:
         # forward the template once
         z_patch_arr, _, z_amask_arr = sample_target(image, bbox, self.cfg.template_factor,
                                                     output_sz=self.cfg.template_size)
@@ -25,7 +26,7 @@ class starks50(Tracker):
         # save states
         self.state = bbox
 
-    def track(self, image):
+    def track(self, image: np.array) -> list:
         H, W, _ = image.shape
         x_patch_arr, resize_factor, x_amask_arr = sample_target(image, self.state, self.cfg.search_factor,
                                                                 output_sz=self.cfg.search_size)  # (x1, y1, w, h)
@@ -56,7 +57,7 @@ class starks50(Tracker):
 
 
 class starkst50(Tracker):
-    def __init__(self, checkpoint_path=None, use_cuda=True, update_intervals=200):
+    def __init__(self, checkpoint_path=None, use_cuda=True, update_intervals=50):
         super().__init__(checkpoint_path, use_cuda, 'starkst50')
         self.cfg = cfg_st50()
         self.network = Starkst50().to(self.device).eval()
@@ -66,7 +67,7 @@ class starkst50(Tracker):
         self.update_intervals = [update_intervals]
         self.num_extra_template = len(self.update_intervals)
 
-    def init(self, image, bbox):
+    def init(self, image: np.array, bbox: list) -> None:
         self.z_dict_list = []
         # get the 1st template
         z_patch_arr1, _, z_amask_arr1 = sample_target(image, bbox, self.cfg.template_factor,
@@ -83,7 +84,7 @@ class starkst50(Tracker):
         self.state = bbox
         self.frame_id = 0
 
-    def track(self, image):
+    def track(self, image: np.array) -> list:
         H, W, _ = image.shape
         self.frame_id += 1
 
@@ -128,7 +129,7 @@ class starkst50(Tracker):
 
 
 class starkst101(Tracker):
-    def __init__(self, checkpoint_path=None, use_cuda=True, update_intervals=200):
+    def __init__(self, checkpoint_path=None, use_cuda=True, update_intervals=50):
         super().__init__(checkpoint_path, use_cuda, 'starkst101')
         self.cfg = cfg_st101()
         self.network = Starkst101().to(self.device).eval()
@@ -138,7 +139,7 @@ class starkst101(Tracker):
         self.update_intervals = [update_intervals]
         self.num_extra_template = len(self.update_intervals)
 
-    def init(self, image, bbox):
+    def init(self, image, bbox) -> None:
         self.z_dict_list = []
         # get the 1st template
         z_patch_arr1, _, z_amask_arr1 = sample_target(image, bbox, self.cfg.template_factor,
@@ -155,7 +156,7 @@ class starkst101(Tracker):
         self.state = bbox
         self.frame_id = 0
 
-    def track(self, image):
+    def track(self, image: np.array) -> list:
         H, W, _ = image.shape
         self.frame_id += 1
 

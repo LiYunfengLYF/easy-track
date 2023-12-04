@@ -1,57 +1,36 @@
 import cv2
+import numpy as np
 from tqdm import tqdm
-
-from .load import easy_seqread, easy_txtread
 from .others import tqdm_update
+from .load import easy_seqread, easy_txtread
 from ..utils import draw_box, imread, load_seq_result, speed2waitkey
-
 from ..utils.dataset import otbDataset, utb180Dataset, uot100Dataset, lasotDataset
 
 
-def imshow(winname, image, waitkey=0, resize=None):
+def imshow(winname: str, image: np.array, waitkey=0, resize: [tuple, list] = None):
     """
     Description
-        imshow is an extension of cv2.imshow
-        Different with cv2.imshow, it input is an RGB image, and window size is variable
-
-    Params:
-        winname:    str
-        image:      np.array
-        waitkey:    default is 0
-        resize:     tuple
-
+        imshow is an easy extension of cv2.imshow
+        Different with cv2.imshow, its input is an RGB image, and window size is variable
     """
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     cv2.namedWindow(winname, cv2.WINDOW_FREERATIO)
 
-    if resize is not None :
+    if resize is not None:
         cv2.resizeWindow(winname, resize)
     cv2.imshow(winname, image)
     key = cv2.waitKey(waitkey)
     return key
 
 
-def seqshow(imgs_file, imgs_type=r'jpg', result_file=None, gt_file=None, show_gt=True, speed=20, tracker_name='',
-            seq_name=r'default', result_color=(0, 0, 255), thickness=2):
+def seqshow(imgs_file: str, imgs_type: str = r'jpg', result_file: str = None, gt_file: str = None, show_gt=True,
+            speed: int = 20, tracker_name: str = '', seq_name: int = r'default', result_color: tuple = (0, 0, 255),
+            thickness: int = 2) -> None:
     """
     Description
         seqshow visualizes the bounding box results of the tracker in image sequence
-
         if results_file is none, tracker results (default is red bounding box) will not be displayed on sequence
         if gt_file is none or show_gt is False, groundtruth (green bounding box) will not be displayed on sequence
-
-    Params:
-        imgs_file:      str
-        imgs_type:      default is '.jpg', you can change it
-        result_file:    str
-        gt_file:        str
-        show_gt:        True or False
-        speed:          FPS
-        tracker_name:   str
-        seq_name:       str
-        result_color:   default is red (0,0,255), you can change it
-        thickness:      int
-
     """
 
     # decode images, tracker's results and gt
@@ -76,7 +55,7 @@ def seqshow(imgs_file, imgs_type=r'jpg', result_file=None, gt_file=None, show_gt
 
 
 def datasetshow(dataset, result_file=None, show_gt=True, thickness=2, speed=20, tracker_name=r'',
-                result_color=(0, 0, 255), ):
+                result_color=(0, 0, 255), ) -> None:
     for seq_id, (seq_name, imgs_dir, gt) in enumerate(dataset):
         show_name = tracker_name + '-' + seq_name
         seq_result = load_seq_result(dataset_file=result_file, seq_name=seq_name)
@@ -99,7 +78,8 @@ def datasetshow(dataset, result_file=None, show_gt=True, thickness=2, speed=20, 
         close_cv2_window(show_name)
 
 
-def show_otb(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True, tracker_name=r''):
+def show_otb(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True,
+             tracker_name=r'') -> None:
     """
     Description
         show_otb visualizes the bounding box results of the tracker in otb benchmark
@@ -121,7 +101,8 @@ def show_otb(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255)
                 result_color=result_color)
 
 
-def show_lasot(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True, tracker_name=r''):
+def show_lasot(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True,
+               tracker_name=r'') -> None:
     """
     Description
         show_lasot visualizes the bounding box results of the tracker in lasot benchmark
@@ -143,7 +124,8 @@ def show_lasot(dataset_files, result_file=None, speed=20, result_color=(0, 0, 25
                 result_color=result_color)
 
 
-def show_uot(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True, tracker_name=r''):
+def show_uot(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True,
+             tracker_name=r'') -> None:
     """
     Description
         show_uot visualizes the bounding box results of the tracker in uot benchmark
@@ -165,29 +147,20 @@ def show_uot(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255)
                 result_color=result_color)
 
 
-def show_utb(dataset_files, result_file=None, speed=20, result_color=(0, 0, 255), show_gt=True, tracker_name=r''):
+def show_utb(dataset_files: str, result_file: str = None, speed: int = 20, result_color: tuple = (0, 0, 255),
+             show_gt: bool = True, tracker_name: str = r'') -> None:
     """
     Description
         show_utb visualizes the bounding box results of the tracker in uot benchmark
-
         if results_file is none, tracker results (default is red bounding box) will not be displayed on utb
         if show_gt is False, groundtruth (green bounding box) will not be displayed on utb
-
-    Params:
-        dataset_files:  str
-        result_file:    str
-        speed:          FPS, default is 20
-        result_color:   default is red (0,0,255), you can change it
-        show_gt:        True or False
-        tracker_name:   str
-
     """
     utb = utb180Dataset(dataset_files)
     datasetshow(utb, result_file=result_file, show_gt=show_gt, speed=speed, tracker_name=tracker_name,
                 result_color=result_color)
 
 
-def close_cv2_window(winname):
+def close_cv2_window(winname: str) -> None:
     """
     Description
         close an opened window of cv2
@@ -198,5 +171,6 @@ def close_cv2_window(winname):
     """
     cv2.destroyWindow(winname)
 
-def greenprint(text):
+
+def greenprint(text: str) -> None:
     print(f"\033[92m{text}\033[0m")

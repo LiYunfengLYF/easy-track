@@ -1,17 +1,11 @@
 import torch
+import numpy as np
 
 
-def speed2waitkey(speed):
+def speed2waitkey(speed: int) -> int:
     """
     Description
-        trans fps to waitkey of cv2
-
-    Params:
-        speed:      fps, int
-
-    return:
-        waitkey:    int
-
+        fps to waitkey of cv2
     """
     if speed == 0:
         return 0
@@ -19,7 +13,7 @@ def speed2waitkey(speed):
         return int((1 / speed) * 1000)
 
 
-def img2tensor(img, device='cuda:0'):
+def img2tensor(img: np.array, device: str = 'cuda:0') -> torch.tensor:
     """
     Description
         transfer an img to a tensor

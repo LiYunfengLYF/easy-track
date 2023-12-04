@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from .config import cfg
 from .models import LightFC
@@ -25,7 +26,7 @@ class lightfc(Tracker):
         # motion constrain
         self.output_window = hann2d(torch.tensor([self.feat_sz, self.feat_sz]).long(), centered=True).to(self.device)
 
-    def init(self, image, bbox):
+    def init(self, image: np.array, bbox: list) -> None:
         H, W, _ = image.shape
 
         z_patch_arr, resize_factor = sample_target(image, bbox, self.cfg.template_factor,
@@ -39,7 +40,7 @@ class lightfc(Tracker):
         self.state = bbox
         self.frame_id = 0
 
-    def track(self, image):
+    def track(self, image: np.array) -> list:
         H, W, _ = image.shape
         self.frame_id += 1
         x_patch_arr, resize_factor = sample_target(image, self.state, self.cfg.search_factor,

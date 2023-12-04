@@ -7,14 +7,11 @@ from tqdm import tqdm
 from .utils import mobilenet_v2
 from ..utils import imread, seqread, img2tensor
 
-def remove_timetxt(results_file):
+
+def remove_timetxt(results_file: str) -> None:
     """
     Description
         Remove *_time.txt files from results_file
-
-    Params:
-        results_file:   file path
-
     """
     txt_list = os.listdir(results_file)
     remove_list = []
@@ -29,8 +26,9 @@ def remove_timetxt(results_file):
     print(f'Finish remove *_time.txt in {results_file}')
 
 
-def remove_same_img(file, save_file, checkpoint_path=None, device='cuda:0', resize=(320, 640), thred=0.4,
-                    show_same=False, start=1):
+def remove_same_img(file: str, save_file: str, checkpoint_path: str = None, device: str = 'cuda:0',
+                    resize: [tuple, list] = (320, 640), thred: float = 0.4, show_same: bool = False,
+                    start: int = 1) -> None:
     """
     Description
         Remove same images in file and sort and save the rest images in save file
@@ -38,12 +36,6 @@ def remove_same_img(file, save_file, checkpoint_path=None, device='cuda:0', resi
         You need to sign the checkpoint_path of mobilenet_v2-b0353104.pth (from torchvision) and thred (default is 0.4)
         if not sign checkpoint path, it will search for weights in the etrack_checkpoints directory of the running .py file
         show_same=True will show the same image pair
-
-    Params:
-        results_file:       file path
-        save_file:          file path
-        checkpoint_path:    checkpoint path
-
     """
     logging.warning('Use MobilenetV2 to compute the similarity of images')
     logging.warning('MobileNetV2 use pretrained model is mobilenet_v2-b0353104.pth, download it at torchvision toolkit')

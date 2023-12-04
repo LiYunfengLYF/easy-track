@@ -7,7 +7,7 @@ from ..utils import seqread
 
 
 def trans_imgs_order_name(file, save_file, sort=True, imgs_format='.jpg', preread=True, format_name=False, width=4,
-                          start=1, end=None, ):
+                          start=1, end=None, ) -> None:
     """
     Description
         transfer image into an order name, and save in save_file

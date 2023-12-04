@@ -1,4 +1,3 @@
-import os
 import torch
 import numpy as np
 from ..utils import txtread
@@ -67,7 +66,7 @@ def calc_seq_performace(results_boxes, gt_boxes):
     return auc_score, prec_score, norm_prec_score
 
 
-def report_seq_performance(gt_file, results_file):
+def report_seq_performance(gt_file: str, results_file: str) -> None:
     """
     Description
         calc Success Score, Precision Score, Norm Precision Score, Success Rate of on a sequence
