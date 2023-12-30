@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def selectROI(winname: str, img: np.array, resize: [list, tuple]) -> list:
+def selectROI(winname: str, img: np.array, resize: [list, tuple]=None) -> list:
     """
     Description
         selectROI is an easy extension of cv2.selectROI

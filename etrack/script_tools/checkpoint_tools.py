@@ -1,5 +1,8 @@
 import os
+
 import torch
+
+
 def extract_weights_from_checkpoint(checkpoint_file, out_file=None, name=None, key=None):
     """
     Description
@@ -34,10 +37,13 @@ def extract_weights_from_checkpoint(checkpoint_file, out_file=None, name=None, k
     try:
         if key is None:
             total_state_dict = torch.load(checkpoint_file)
-            for key_item in ['net', 'network', 'model']:
-                state_dict = total_state_dict[key_item]
-                print(f'\tloading state_dict from key: {key_item}')
-                break
+            for key_item in ['net', 'network', 'model', 'state_dict']:
+                try:
+                    state_dict = total_state_dict[key_item]
+                    print(f'\tloading state_dict from key: {key_item}')
+                    break
+                except:
+                    pass
         else:
             state_dict = torch.load(checkpoint_file)[key]
 
@@ -65,7 +71,6 @@ def show_checkpoint_keys(checkpoint_file):
 
     """
 
-
     try:
         state_dict = torch.load(checkpoint_file)
     except Exception as e:
@@ -74,5 +79,4 @@ def show_checkpoint_keys(checkpoint_file):
 
     print('Keys:')
     for key in state_dict:
-        print('\t',key)
-
+        print('\t', key)

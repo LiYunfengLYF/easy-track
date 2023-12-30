@@ -1,9 +1,11 @@
 import os
+
 import numpy as np
 from tqdm import tqdm
+
 from .analysis import calc_seq_performace
 from ..utils import imread, draw_box, speed2waitkey, selectROI, txtread, seqread, imshow, \
-    close_cv2_window
+    close_cv2_window, greenprint
 
 
 def quick_start(tracker, seq_file, speed=20, imgs_type='.jpg'):
@@ -39,7 +41,7 @@ def quick_start(tracker, seq_file, speed=20, imgs_type='.jpg'):
 
 
 def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, visual=False, speed=20, imgs_type='.jpg',
-                 select_roi=False, report_performance=True):
+                 select_roi=False, report_performance=True,desc=r'running:'):
     """
     Description
 
@@ -50,8 +52,9 @@ def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, vi
         speed:      FPS speed, default = 20
         imgs_type:  image type, default = '.jpg'
     """
+    skip_circulate = False
 
-    save_path = os.getcwd() if save_path is not None else save_path
+    save_path = os.getcwd() if save_path is None else save_path
 
     select_roi = (True if gt_file is None else False) or select_roi
 
@@ -65,39 +68,50 @@ def run_sequence(tracker, seq_file, gt_file=None, save_path=None, save=False, vi
     except:
         winname = 'sequence'
 
-    for num, img_dir in tqdm(enumerate(imgs_list), total=len(imgs_list), desc=r'running:'):
-        image = imread(img_dir)
-
-        if num == 0:
-            if select_roi:
-                init_box = result = selectROI(winname, image)
-                close_cv2_window(winname) if visual is False else None
+    if save:
+        if os.path.exists(save_path):
+            if len(txtread(save_path)) == len(imgs_list):
+                greenprint(f'{save_path} is already!. skip it')
+                skip_circulate = True
             else:
-                init_box = result = gt[0]
+                os.remove(save_path)
+                greenprint(f'{save_path} is already exit!. remove it')
+    if not skip_circulate:
+        for num, img_dir in tqdm(enumerate(imgs_list), total=len(imgs_list), desc=desc):
+            image = imread(img_dir)
 
-            tracker.init(image, init_box)
-        else:
-            result = tracker.track(image)
+            if num == 0:
+                if select_roi:
+                    init_box = result = selectROI(winname, image)
+                    close_cv2_window(winname) if visual is False else None
+                else:
+                    init_box = result = gt[0]
 
-        if result is not None:
-            if visual:
-                image = draw_box(image, result, color=(0, 0, 255), thickness=2)
-                imshow(winname, image, waitkey=speed2waitkey(speed))
-            if save or report_performance:
-                result_list.append(result)
-        else:
-            raise print('result is None !!!')
+                tracker.init(image, init_box)
+            else:
+                result = tracker.track(image)
 
-    results_boxes = np.array(result_list)
+            if result is not None:
+                if visual:
+                    image = draw_box(image, result, color=(0, 0, 255), thickness=2)
+                    imshow(winname, image, waitkey=speed2waitkey(speed))
+                if save or report_performance:
+                    result_list.append(result)
+            else:
+                raise print('result is None !!!')
+
+    if result_list is not None and len(result_list) == len(imgs_list):
+        results_boxes = np.array(result_list)
+    else:
+        results_boxes = txtread(save_path)
 
     if save:
-        pass
+        np.savetxt(fname=save_path, X=results_boxes, fmt='%d', delimiter='\t')
 
     if report_performance and (gt is not None):
-        succ_score, prec_score, norm_prec_score, succ_rate = calc_seq_performace(results_boxes, gt)
+        succ_score, prec_score, norm_prec_score = calc_seq_performace(results_boxes, gt)
         print(f'{tracker.name} performance:')
         print(f'\tSuccess Score:\t\t\t\t{round(succ_score, 2)}')
         print(f'\tPrecision Score:\t\t\t{round(prec_score, 2)}')
         print(f'\tNorm Precision Score:\t\t{round(norm_prec_score, 2)}')
-        print(f'\tSuccess Rate:\t\t\t\t{round(succ_rate, 2)}')
-        return succ_score, prec_score, norm_prec_score, succ_rate
+        return succ_score, prec_score, norm_prec_score

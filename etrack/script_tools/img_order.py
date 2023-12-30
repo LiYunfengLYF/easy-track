@@ -48,7 +48,7 @@ def trans_imgs_order_name(file, save_file, sort=True, imgs_format='.jpg', prerea
     if format_name:
         name_list = [f'{i:0{width}}' + imgs_format for i in range(start, end + 1)]
     else:
-        name_list = [str(i) + imgs_format for i in range(start, end + 1)]
+        name_list = [str(i) + imgs_format for i in range(end + 1 - start)]
 
     save_items = [os.path.join(save_file, item) for item in name_list]
     if not preread:
@@ -58,12 +58,12 @@ def trans_imgs_order_name(file, save_file, sort=True, imgs_format='.jpg', prerea
     for i in tqdm(range(end + 1 - start), total=(end + 1 - start), desc='running: '):
         if preread:
             try:
-                images = cv2.imread(file_items[i])
+                images = cv2.imread(file_items[i + start])
                 cv2.imwrite(save_items[i], images)
             except Exception as E:
                 print(E)
                 raise f'Error at item {file_items[i]}, please check it !!!'
         else:
-            shutil.copy(file_items[i], save_items[i])
+            shutil.copy(file_items[i + start], save_items[i])
 
     print(f"Finish trans image from {file} to {save_file}")

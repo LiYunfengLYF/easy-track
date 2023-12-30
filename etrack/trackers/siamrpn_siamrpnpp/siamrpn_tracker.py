@@ -216,7 +216,7 @@ class siamrpn_alex(_siamrpn):
 
 class siamrpnpp_mobilev2(_siamrpn):
     def __init__(self, checkpoint_path=None, use_cuda=True):
-        super().__init__(checkpoint_path, use_cuda, 'siamrpn_mobilev2')
+        super().__init__(checkpoint_path, use_cuda, 'siamrpnpp_mobilev2')
 
         self.cfg = cfg_siamrpnpp_mobilev2_dwcorr()
         self.network = SiamRPNpp_Mobilev2().eval().to(self.device)

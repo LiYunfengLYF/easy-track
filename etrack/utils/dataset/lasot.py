@@ -1,8 +1,10 @@
 import os
-from ..load import txtread,seqread
+
+from ..load import txtread, seqread
 
 
 class lasotDataset(object):
+    name = 'lasot'
     sequence_list = [
         'airplane-1', 'airplane-9', 'airplane-13', 'airplane-15', 'basketball-1', 'basketball-6', 'basketball-7',
         'basketball-11', 'bear-2', 'bear-4', 'bear-6', 'bear-17', 'bicycle-2', 'bicycle-7', 'bicycle-9',
@@ -37,6 +39,7 @@ class lasotDataset(object):
         'lizard-13', 'microphone-2', 'microphone-6', 'microphone-14', 'microphone-16', 'monkey-3', 'monkey-4',
         'monkey-9', 'monkey-17', 'shark-2', 'shark-3', 'shark-5', 'shark-6', 'squirrel-8', 'squirrel-11',
         'squirrel-13', 'squirrel-19', 'volleyball-1', 'volleyball-13', 'volleyball-18', 'volleyball-19']
+
     def __init__(self, path):
         super(lasotDataset, self).__init__()
         self.path = path
